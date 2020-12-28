@@ -38,7 +38,7 @@ class backend:
         path = os.path.join("..", "fds")
         path = os.path.join("..", path)
         filename = os.path.join(path,filename)
-        fdscommand = "time mpiexec -np 1  fds {}.fds"
+        fdscommand = "mpiexec -np 1  fds {}.fds"
 
         #creates data folder if it doesnt exist, move to data folder
         if not os.path.isdir('data'):
