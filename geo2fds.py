@@ -134,7 +134,8 @@ class geo2fds:
 
                 self.allObst.append(obst.format(xUL+(row*horz), xUL+((row+1)*horz),yUL+(col*vert),yUL+((col+1)*vert),zMin,DEM[row,col],sID))
 
-    def fire(self,hrrpua,tStart, tEnd,xFire, yFire):
+    def fire(self,hrrpua,tStart, tEnd,xFire, yFire
+             ):
         assert tStart<tEnd
         fireOut = "&SURF ID='IGN FIRE', HRRPUA = {}, COLOR = 'RED', RAMP_Q = 'fire' /\n" \
                   "&RAMP ID='fire', T=0, F=0. /\n" \

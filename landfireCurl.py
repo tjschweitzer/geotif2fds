@@ -19,8 +19,10 @@ class backend:
         print("Curl Complete")
 
     def makeGeo(self):
-        fdsFile = geo2fds(self.filedir,1,4,self.title)
-        temp=fdsFile.make_fds()
+        fdsFile = geo2fds(self.filedir,120,4,self.title)
+
+
+        temp=fdsFile.make_fds(hrrpua=2500)
         self.filename = self.filedir.split("/")[-1]
         if not os.path.isdir('fds'):
             os.mkdir ('fds')
@@ -32,8 +34,11 @@ class backend:
             print("Write Error\n", e)
 
     def fdsRun(self):
-        filename=self.filename.split('.')[0]+'.fds'
-        fdscommand = "time mpiexec -np 1  fds ../../fds/{}"
+        filename=self.filename.split('.')[0]
+        path = os.path.join("..", "fds")
+        path = os.path.join("..", path)
+        filename = os.path.join(path,filename)
+        fdscommand = "time mpiexec -np 1  fds {}.fds"
 
         #creates data folder if it doesnt exist, move to data folder
         if not os.path.isdir('data'):
@@ -48,7 +53,8 @@ class backend:
 
         os.chdir(self.title)
         os.system(fdscommand.format(filename))
-        os.system("smokeview {}".format(filename.split('.')[0]+".smv"))
+        print(os.getcwd())
+        os.system("smokeview {}".format(self.filename.split('.')[0]+".smv"))
 
 if __name__ == "__main__":
     #test data
@@ -58,6 +64,8 @@ if __name__ == "__main__":
     elif len(sys.argv) == 4:
         lat,long = float(sys.argv[1]),float(sys.argv[2])
         filename = sys.argv[3]+".tif"
+    else:
+        print("Please input 3 parameters latitude, longitude, and510 desired filename ")
     app = backend(filename,lat,long)
     app.makeGeo()
     app.fdsRun()
