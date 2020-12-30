@@ -55,6 +55,7 @@ class backend:
         os.system(fdscommand.format(filename))
         print(os.getcwd())
         os.chdir('..')
+
         shutil.make_archive(self.title+"-compress",'zip',self.title)
         # os.system("smokeview {}".format(self.filename.split('.')[0]+".smv"))
         return self.title+"compress.zip"
