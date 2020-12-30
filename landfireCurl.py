@@ -1,6 +1,5 @@
-import os, sys
+import os, sys, shutil
 from geo2fds import geo2fds
-import time
 from datetime import date
 
 
@@ -10,16 +9,17 @@ from datetime import date
 class backend:
     def __init__(self,saveName,lat,long,version="LF140", resolution=30,size=5):
         today = date.today()
-        d2 = today.strftime("%Y-%m-%d")
+        d2 = today.strftime("%Y-%m-%d-")
 
         self.title=d2+saveName.split('.')[0]
         self.filedir="image/"+saveName
         command = "curl -s -k \"https://aws.wfas.net/geoserver/ows?service=WPS&version=1.0.0&request=execute&identifier=gs:LandscapeExport&DataInputs=Longitude={};Latitude={};Version={};Resolution={};Extent={}&RawDataOutput=output\" -o {}"
-        os.system(command.format(long,lat,version,resolution,size,self.filedir))
+        e = os.system(command.format(long,lat,version,resolution,size,self.filedir))
+        print(e)
         print("Curl Complete")
 
-    def makeGeo(self):
-        fdsFile = geo2fds(self.filedir,120,4,self.title)
+    def makeGeo(self,time=1):
+        fdsFile = geo2fds(self.filedir,time,4,self.title)
 
 
         temp=fdsFile.make_fds(hrrpua=2500)
@@ -54,7 +54,10 @@ class backend:
         os.chdir(self.title)
         os.system(fdscommand.format(filename))
         print(os.getcwd())
-        os.system("smokeview {}".format(self.filename.split('.')[0]+".smv"))
+        os.chdir('..')
+        shutil.make_archive(self.title+"-compress",'zip',self.title)
+        # os.system("smokeview {}".format(self.filename.split('.')[0]+".smv"))
+        return self.title+"compress.zip"
 
 if __name__ == "__main__":
     #test data

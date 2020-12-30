@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+
+
+
+{% block body %}
+ <h1>{% block title %}Request{% endblock %}</h1>
+  <form method="post">
+    <label for="name">Simulation Name</label>
+    <br>
+    <input  name="name" id="name" required>
+    <br>
+    <label for="longitude">Longitude</label>
+    <br>
+    <input  name="longitude" id="longitude" required>
+    <br>
+    <label for="latitude">Latitude</label>
+    <br>
+    <input name="latitude" id="latitude" required>
+    <br>
+    <label for="resolution">Output resolution (in meters): minimum 30 (default), maximum 300.</label>
+    <br>
+    <input  name="resolution" id="resolution" value="30" required>
+    <br>
+    <label for="extent">Extent of the output files (in miles): minimum 5 , maximum 60. Default value is 5.</label>
+    <br>
+    <input name="extent" id="extent" value="5" required>
+    <br>
+    <label for="time">Duration of simulation in seconds</label>
+    <br>
+    <input name="time" id="time" value="1" required>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}
