@@ -58,7 +58,7 @@ class backend:
 
         shutil.make_archive(self.title+"-compress",'zip',self.title)
         # os.system("smokeview {}".format(self.filename.split('.')[0]+".smv"))
-        return self.title+"compress.zip"
+        return self.title+"-compress.zip"
 
 if __name__ == "__main__":
     #test data
