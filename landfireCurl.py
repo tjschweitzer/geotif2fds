@@ -10,9 +10,13 @@ class backend:
     def __init__(self,saveName,lat,long,version="LF140", resolution=30,size=5):
         today = date.today()
         d2 = today.strftime("%Y-%m-%d-")
-
         self.title=d2+saveName.split('.')[0]
-        self.filedir="image/"+saveName
+
+        #checks if image folder exists
+        if not os.path.isdir('image'):
+            os.mkdir ('image')
+
+        self.filedir=os.path.join('image',saveName)
         command = "curl -s -k \"https://aws.wfas.net/geoserver/ows?service=WPS&version=1.0.0&request=execute&identifier=gs:LandscapeExport&DataInputs=Longitude={};Latitude={};Version={};Resolution={};Extent={}&RawDataOutput=output\" -o {}"
         e = os.system(command.format(long,lat,version,resolution,size,self.filedir))
         print(e)
