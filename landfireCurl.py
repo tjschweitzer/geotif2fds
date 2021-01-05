@@ -12,9 +12,12 @@ class backend:
         d2 = today.strftime("%Y-%m-%d-")
         self.title=d2+saveName.split('.')[0]
 
+
+
         #checks if image folder exists
         if not os.path.isdir('image'):
             os.mkdir ('image')
+
 
         self.filedir=os.path.join('image',saveName)
         command = "curl -s -k \"https://aws.wfas.net/geoserver/ows?service=WPS&version=1.0.0&request=execute&identifier=gs:LandscapeExport&DataInputs=Longitude={};Latitude={};Version={};Resolution={};Extent={}&RawDataOutput=output\" -o {}"
@@ -75,5 +78,7 @@ if __name__ == "__main__":
     else:
         print("Please input 3 parameters latitude, longitude, and510 desired filename ")
     app = backend(filename,lat,long)
+
     app.makeGeo()
     app.fdsRun()
+
