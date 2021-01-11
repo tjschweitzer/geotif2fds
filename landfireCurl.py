@@ -8,6 +8,10 @@ from datetime import date
 
 class backend:
     def __init__(self,saveName,lat,long,version="LF140", resolution=30,size=5):
+        self.checkConus(lat,long)
+
+
+
         today = date.today()
         d2 = today.strftime("%Y-%m-%d-")
         self.title=d2+saveName.split('.')[0]
@@ -24,6 +28,16 @@ class backend:
         e = os.system(command.format(long,lat,version,resolution,size,self.filedir))
         print(e)
         print("Curl Complete")
+
+    def checkConus(self,lat,long):
+        top = 49.3457868  # north lat
+        left = -124.7844079  # west long
+        right = -66.9513812  # east long
+        bottom = 24.7433195  # south lat
+
+        assert top >= lat >= bottom
+        assert right >= long >= left
+
 
     def makeGeo(self,time=1):
         fdsFile = geo2fds(self.filedir,time,4,self.title)

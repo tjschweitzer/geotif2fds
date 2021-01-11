@@ -202,45 +202,11 @@ class geo2fds:
 
         return outputStr
 
-
-
-
-
-# # Using the Haversine Formula
-#     def distnace_calc(self):
-#         for i in self.meta_data:
-#             print (i,self.meta_data[i])
-#         R = 637.3 # radious of earth in KM
-#         lat_1 = math.radians(self.meta_data['crs']['lat_1'])
-#         lat_2 = math.radians(self.meta_data['crs']['lat_2'])
-#         # lon_0 = math.radians(self.meta_data['crs']['lon_0'])
-#
-#         delta_lat = lat_2 - lat_1
-#
-#         a = math.sin(delta_lat/2)**2 + math.cos(lat_1)*math.cos(lat_2)*math.sin(0)**2
-#         c = 2 * math.atan2(math.sqrt(a),math.sqrt(1-a))
-#         distance = R * c *100
-#         # print("Distance in KM ", distance )
-#         distance=round(distance*1000)
-#         self.size_m=distance
-#         self.width_m_per_px = round(distance/ self.meta_data['width'])
-#         self.length_m_per_px = round(distance/ self.meta_data['height'])
-#         self.min_elevation = self.raw_layers[0].min()
-#         self.max_elevation = self.raw_layers[0].max()
-#         self.sky_elevation= math.ceil(self.max_elevation/1000)*1000
-#         # print(self.length_m_per_px, "Height")
-#         # print(self.width_m_per_px, "Width")
-#         # print(self.sky_elevation, "Sky Height")
-
-
 if __name__ =="__main__":
     filename = "image/output.tif"
     title = "This is the Title "  # Todo: sys.arg maybeh?
-
     test = geo2fds(filename,1.0,4,title)
-
     temp=test.make_fds()
-
     try:
         with open(filename.split('.')[0]+'.fds','w') as output_file:
             output_file.write(temp)
