@@ -8,7 +8,7 @@ import multimesh
 
 class geo2fds:
 
-    """"
+    """
     filename = filename for 8 band geotiff from landfire
         1 	Elevation 	DEM
         2 	Slope 	SLP
@@ -20,15 +20,8 @@ class geo2fds:
         8 	Forest Canopy Bulk Density 	CBD
     time = duration of fds simulation
     title = title of fds job
-
     """
-
-
-
     def __init__(self, filename,time,level,title=''):
-
-
-
         self.FmDict = {
             91: [0, "Urban"],
             92: [0, "Snow/Ice"],
@@ -83,7 +76,6 @@ class geo2fds:
         self.dataset = rasterio.open(filename)
         self.topo()
 
-
     """
     DEM = elevation of each index value
     FM40 = FBFM40 fuel model value
@@ -109,16 +101,15 @@ class geo2fds:
         x,y = DEM.shape
         z=zMax-zMin//x
 
-        # print(xLR,xUL)
-        # print(yLR,yUL)
-        # print(x,y)
-        # print([xUL, xLR, yUL, yLR, zMin, zMax])
+
         horz=round(horz)
         vert= round(vert)
         xLR, yLR = round(xLR),round(yLR)
         xUL, yUL = round(xUL),round(yUL)
         zMin = round(zMin)
         zMax = round(zMax)
+
+        # Todo: fix multi mesh
         # creates the multimesh
         # xMesh = multimesh.multiMesh([  yLR,yUL,xUL, xLR,zMin,zMax],[50,50,50],[1,1,1])
         # mesh, mult =xMesh.meshGen()
@@ -134,6 +125,10 @@ class geo2fds:
 
                 self.allObst.append(obst.format(xUL+(row*horz), xUL+((row+1)*horz),yUL+(col*vert),yUL+((col+1)*vert),zMin,DEM[row,col],sID))
 
+
+    """
+    fireOut = timeframe for when fire starts and ends
+    """
     def fire(self,hrrpua,tStart, tEnd,xFire, yFire):
         assert tStart<tEnd
         fireOut = "&SURF ID='IGN FIRE', HRRPUA = {}, COLOR = 'RED', RAMP_Q = 'fire' /\n" \
@@ -149,7 +144,7 @@ class geo2fds:
         fireOut  += "&OBST XB={},{},{},{},{},{},SURF_ID = 'IGN FIRE' /\n".format(x,x+50,y,y+50,z,z+1)
         return fireOut
 
-
+    # Todo update FM13 to 40
     def fueldata(self):
         fuelOut = "&SURF ID='1', VEG_LSET_FUEL_INDEX=1, RGB=255,254,222/\n" \
                   "&SURF ID='2', VEG_LSET_FUEL_INDEX=2, RGB=255,253,102/\n" \
@@ -165,8 +160,6 @@ class geo2fds:
                   "&SURF ID='12',  VEG_LSET_FUEL_INDEX=12, RGB=148,212,116/\n" \
                   "&SURF ID='13',  VEG_LSET_FUEL_INDEX=13, RGB=88,212,102/\n" \
                   "&SURF ID='0',  RGB=186, 119, 80/\n"
-
-
         return fuelOut
 
 
@@ -195,8 +188,6 @@ class geo2fds:
 
         for line in self.allObst:
             outputStr += line +"\n"
-
-
 
         outputStr += "\n&TAIL /"   #End of File
 

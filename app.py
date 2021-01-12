@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, request, render_template,send_file
+from flask import Flask, flash, request, render_template,send_file
 import landfireCurl
 
 
@@ -20,6 +20,9 @@ def my_form():
 
 @app.route('/request', methods=['POST'])
 def my_form_post():
+
+
+
     name = request.form['name']
     if ".tif" not in name:
         name = name.split('.')[0]+'.tif'

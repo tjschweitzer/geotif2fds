@@ -1,4 +1,4 @@
-#!/home/kl3pt0/PycharmProjects/geotif/venv/bin/python
+#!/home/kl3pt0/Work/geotif2fds/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

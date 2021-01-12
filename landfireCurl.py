@@ -8,27 +8,26 @@ from datetime import date
 
 class backend:
     def __init__(self,saveName,lat,long,version="LF140", resolution=30,size=5):
+
         self.checkConus(lat,long)
 
-
-
+        # builds unique(ish) folder name system
         today = date.today()
         d2 = today.strftime("%Y-%m-%d-")
         self.title=d2+saveName.split('.')[0]
-
-
 
         #checks if image folder exists
         if not os.path.isdir('image'):
             os.mkdir ('image')
 
-
         self.filedir=os.path.join('image',saveName)
+
+        # builds and runs curl command
         command = "curl -s -k \"https://aws.wfas.net/geoserver/ows?service=WPS&version=1.0.0&request=execute&identifier=gs:LandscapeExport&DataInputs=Longitude={};Latitude={};Version={};Resolution={};Extent={}&RawDataOutput=output\" -o {}"
         e = os.system(command.format(long,lat,version,resolution,size,self.filedir))
-        print(e)
-        print("Curl Complete")
 
+    # Checks values for latitude and longitude
+    # https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States
     def checkConus(self,lat,long):
         top = 49.3457868  # north lat
         left = -124.7844079  # west long
@@ -41,44 +40,46 @@ class backend:
 
     def makeGeo(self,time=1):
         fdsFile = geo2fds(self.filedir,time,4,self.title)
-
-
         temp=fdsFile.make_fds(hrrpua=2500)
-        self.filename = self.filedir.split("/")[-1]
+        self.filename = self.title+".fds"
+
         if not os.path.isdir('fds'):
             os.mkdir ('fds')
-        path = os.path.join('fds',self.filename.split('.')[0]+'.fds')
+        path = os.path.join('fds',self.filename)
         try:
             with open(path,'w') as output_file:
                 output_file.write(temp)
         except IOError as e:
             print("Write Error\n", e)
 
+
+    # filename ~ path to fds file
+    # fdscommand ~ basic mpi fds command
+    #       Todo: Update -np 1 with number of meshes once mushes can be changed if needed
+    # Returns name of compressed file
     def fdsRun(self):
-        filename=self.filename.split('.')[0]
-        path = os.path.join("..", "fds")
-        path = os.path.join("..", path)
-        filename = os.path.join(path,filename)
-        fdscommand = "mpiexec -np 1  fds {}.fds"
+
+        filename = os.path.join(os.path.join("..", os.path.join("..", "fds")),self.filename)
+        fdscommand = "mpiexec -np 1  fds {}"
 
         #creates data folder if it doesnt exist, move to data folder
         if not os.path.isdir('data'):
             os.mkdir('data')
         os.chdir('data')
-
-
         if not os.path.isdir(self.title):
             os.mkdir (self.title)
         else:
             print("Directory already exists some files may be over written")
 
+        # Changes to folder and runs fds command
         os.chdir(self.title)
         os.system(fdscommand.format(filename))
-        print(os.getcwd())
-        os.chdir('..')
 
+        # moves down one layer then compresses fds files.
+        os.chdir('..')
         shutil.make_archive(self.title+"-compress",'zip',self.title)
-        # os.system("smokeview {}".format(self.filename.split('.')[0]+".smv"))
+
+
         return self.title+"-compress.zip"
 
 if __name__ == "__main__":
