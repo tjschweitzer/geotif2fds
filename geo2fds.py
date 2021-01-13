@@ -129,9 +129,10 @@ class geo2fds:
 
 
     """
+    For Point Fire
     fireOut = timeframe for when fire starts and ends
     """
-    def fire(self,hrrpua,tStart, tEnd,xFire, yFire):
+    def fire(self,hrrpua,tStart, tEnd,xFire, yFire,):
         assert tStart<tEnd
         fireOut = "&SURF ID='IGN FIRE', HRRPUA = {}, COLOR = 'RED', RAMP_Q = 'fire' /\n" \
                   "&RAMP ID='fire', T=0, F=0. /\n" \
@@ -145,6 +146,8 @@ class geo2fds:
         z=self.dataset.read(1)[row,col]
         fireOut  += "&OBST XB={},{},{},{},{},{},SURF_ID = 'IGN FIRE' /\n".format(x,x+50,y,y+50,z,z+1)
         return fireOut
+
+    # Todo Add line fire
 
     # Todo update FM13 to 40
     def fueldata(self):
