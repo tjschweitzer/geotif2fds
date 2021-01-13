@@ -34,8 +34,10 @@ class backend:
         right = -66.9513812  # east long
         bottom = 24.7433195  # south lat
 
-        assert top >= lat >= bottom
-        assert right >= long >= left
+        if top < lat < bottom:
+            quit()
+        if right < long < left:
+            quit()
 
 
     def makeGeo(self,time=1):
