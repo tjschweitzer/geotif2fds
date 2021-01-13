@@ -16,6 +16,16 @@ class backend:
         d2 = today.strftime("%Y-%m-%d-")
         self.title=d2+saveName.split('.')[0]
 
+        if not os.path.isdir('data'):
+            os.mkdir('data')
+        os.chdir('data')
+
+        if not os.path.isdir(self.title):
+            os.mkdir (self.title)
+        else:
+            print("Directory already exists some files may be over written")
+        os.chdir(self.title)
+
         #checks if image folder exists
         if not os.path.isdir('image'):
             os.mkdir ('image')
@@ -34,9 +44,10 @@ class backend:
         right = -66.9513812  # east long
         bottom = 24.7433195  # south lat
 
-        if top < lat < bottom:
+        #  Todo:fix lat and long comparison
+        if top < float(lat) < bottom:
             quit()
-        if right < long < left:
+        if right < float(long) < left:
             quit()
 
 
@@ -61,20 +72,20 @@ class backend:
     # Returns name of compressed file
     def fdsRun(self):
 
-        filename = os.path.join(os.path.join("..", os.path.join("..", "fds")),self.filename)
+        filename = os.path.join("fds",self.filename)
         fdscommand = "mpiexec -np 1  fds {}"
 
         #creates data folder if it doesnt exist, move to data folder
-        if not os.path.isdir('data'):
-            os.mkdir('data')
-        os.chdir('data')
-        if not os.path.isdir(self.title):
-            os.mkdir (self.title)
-        else:
-            print("Directory already exists some files may be over written")
+        # if not os.path.isdir('data'):
+        #     os.mkdir('data')
+        # os.chdir('data')
+        # if not os.path.isdir(self.title):
+        #     os.mkdir (self.title)
+        # else:
+        #     print("Directory already exists some files may be over written")
 
         # Changes to folder and runs fds command
-        os.chdir(self.title)
+
         os.system(fdscommand.format(filename))
 
         # moves down one layer then compresses fds files.
@@ -93,7 +104,7 @@ if __name__ == "__main__":
         lat,long = float(sys.argv[1]),float(sys.argv[2])
         filename = sys.argv[3]+".tif"
     else:
-        print("Please input 3 parameters latitude, longitude, and510 desired filename ")
+        print("Please input 3 parameters latitude, longitude, and desired filename ")
     app = backend(filename,lat,long)
 
     app.makeGeo()

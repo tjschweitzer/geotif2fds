@@ -1,4 +1,4 @@
-import rasterio
+import rasterio, os
 import numpy as np
 import multimesh
 
@@ -73,6 +73,8 @@ class geo2fds:
         self.levelset = level
         self.time=time
         self.title=title
+        # print(os.getcwd())
+        # print(filename)
         self.dataset = rasterio.open(filename)
         self.topo()
 
