@@ -109,5 +109,5 @@ if __name__ == "__main__":
     app = backend(filename,lat,long,fire_points=[[500,500],[600,600]])
 
     app.makeGeo()
-    # app.fdsRun()
+    app.fdsRun()
 
