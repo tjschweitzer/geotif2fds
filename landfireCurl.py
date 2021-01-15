@@ -7,9 +7,10 @@ from datetime import date
 
 
 class backend:
-    def __init__(self,saveName,lat,long,version="LF140", resolution=30,size=5):
+    def __init__(self,saveName,lat,long,version="LF140", resolution=30,size=5,fire_points=[]):
 
         self.checkConus(lat,long)
+        self.fire_points = fire_points
 
         # builds unique(ish) folder name system
         today = date.today()
@@ -52,7 +53,7 @@ class backend:
 
 
     def makeGeo(self,time=1):
-        fdsFile = geo2fds(self.filedir,time,4,self.title)
+        fdsFile = geo2fds(self.filedir,time,self.title,fire_points=self.fire_points)
         temp=fdsFile.make_fds(hrrpua=2500)
         self.filename = self.title+".fds"
 
@@ -105,8 +106,8 @@ if __name__ == "__main__":
         filename = sys.argv[3]+".tif"
     else:
         print("Please input 3 parameters latitude, longitude, and desired filename ")
-    app = backend(filename,lat,long)
+    app = backend(filename,lat,long,fire_points=[[500,500],[600,600]])
 
     app.makeGeo()
-    app.fdsRun()
+    # app.fdsRun()
 

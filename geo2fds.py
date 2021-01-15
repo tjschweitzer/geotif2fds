@@ -2,10 +2,6 @@ import rasterio, os
 import numpy as np
 import multimesh
 
-
-
-
-
 class geo2fds:
 
     """
@@ -20,8 +16,9 @@ class geo2fds:
         8 	Forest Canopy Bulk Density 	CBD
     time = duration of fds simulation
     title = title of fds job
+    fire_points = a 2d array of xy points of ignition points
     """
-    def __init__(self, filename,time,level,title=''):
+    def __init__(self, filename,time,title='',fire_points=[]):
         self.FmDict = {
             91: [0, "Urban"],
             92: [0, "Snow/Ice"],
@@ -70,11 +67,10 @@ class geo2fds:
             204: [13, "SB4"],
         }
         self.file_name=filename
-        self.levelset = level
         self.time=time
         self.title=title
-        # print(os.getcwd())
-        # print(filename)
+        self.fire_points = fire_points
+
         self.dataset = rasterio.open(filename)
         self.topo()
 
@@ -109,7 +105,7 @@ class geo2fds:
         xLR, yLR = round(xLR),round(yLR)
         xUL, yUL = round(xUL),round(yUL)
         zMin = round(zMin)
-        zMax = round(zMax)
+        zMax = round(zMax)+50
 
         # Todo: fix multi mesh
         # creates the multimesh
@@ -132,19 +128,21 @@ class geo2fds:
     For Point Fire
     fireOut = timeframe for when fire starts and ends
     """
-    def fire(self,hrrpua,tStart, tEnd,xFire, yFire,):
+    def fire(self,hrrpua,tStart, tEnd):
         assert tStart<tEnd
         fireOut = "&SURF ID='IGN FIRE', HRRPUA = {}, COLOR = 'RED', RAMP_Q = 'fire' /\n" \
                   "&RAMP ID='fire', T=0, F=0. /\n" \
                   "&RAMP ID='fire', T={}, F=1. /\n" \
                   "&RAMP ID='fire', T={}, F=1. /\n"\
                   "&RAMP ID='fire', T={}, F=0. /\n".format(hrrpua,tStart,tEnd,tEnd+1)
-
-        x, y = (self.dataset.bounds.left + xFire, self.dataset.bounds.top - yFire)
-        row, col = self.dataset.index(x, y)
-        # print(row, col,x,y)
-        z=self.dataset.read(1)[row,col]
-        fireOut  += "&OBST XB={},{},{},{},{},{},SURF_ID = 'IGN FIRE' /\n".format(x,x+50,y,y+50,z,z+1)
+        for fire in self.fire_points:
+            print(fire)
+            xFire,yFire = fire
+            x, y = (self.dataset.bounds.left + xFire, self.dataset.bounds.top - yFire)
+            row, col = self.dataset.index(x, y)
+            # print(row, col,x,y)
+            z=self.dataset.read(1)[row,col]
+            fireOut  += "&OBST XB={},{},{},{},{},{},SURF_ID = 'IGN FIRE' /\n".format(x,x+50,y,y+50,z,z+1)
         return fireOut
 
     # Todo Add line fire
@@ -165,11 +163,13 @@ class geo2fds:
                   "&SURF ID='12',  VEG_LSET_FUEL_INDEX=12, RGB=148,212,116/\n" \
                   "&SURF ID='13',  VEG_LSET_FUEL_INDEX=13, RGB=88,212,102/\n" \
                   "&SURF ID='0',  RGB=186, 119, 80/\n"
+
+
         return fuelOut
 
 
 
-    def make_fds(self,hrrpua=500,tStart =1, tEnd=60,xFire=500, yFire = 500):
+    def make_fds(self,hrrpua=500,tStart =1, tEnd=60):
         # create file...
 
         job_name = self.file_name.split('/')[-1].split('.')[0]
@@ -178,7 +178,7 @@ class geo2fds:
         outputStr += "\n&TIME T_END={} /\n".format(self.time)
         outputStr += "\n&DUMP WRITE_XYZ=.TRUE., DT_PL3D=0.1 /\n"
         outputStr += "&REAC FUEL='CELLULOSE', C=6, H=10, O=5, SOOT_YIELD=0.01, HEAT_OF_COMBUSTION=18607. /\n"
-        outputStr += "&MISC LEVEL_SET_MODE={} /\n".format(self.levelset)
+        outputStr += "&MISC LEVEL_SET_MODE=4 /\n"
 
         outputStr += "\n&VENT MB='XMIN' SURF_ID='OPEN' / \n"
         outputStr += "&VENT MB='XMAX' SURF_ID='OPEN' / \n"
@@ -189,7 +189,7 @@ class geo2fds:
 
         outputStr += self.fueldata()
 
-        outputStr+= self.fire(hrrpua,tStart, tEnd,xFire, yFire)
+        outputStr+= self.fire(hrrpua,tStart, tEnd)
 
         for line in self.allObst:
             outputStr += line +"\n"
@@ -201,7 +201,7 @@ class geo2fds:
 if __name__ =="__main__":
     filename = "image/output.tif"
     title = "This is the Title "  # Todo: sys.arg maybeh?
-    test = geo2fds(filename,1.0,4,title)
+    test = geo2fds(filename,1.0,title)
     temp=test.make_fds()
     try:
         with open(filename.split('.')[0]+'.fds','w') as output_file:
