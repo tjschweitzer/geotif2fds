@@ -65,6 +65,7 @@ class geo2fds:
             202: [12, "SB2"],
             203: [12, "SB3"],
             204: [13, "SB4"],
+            -9999:[0, "Barren"],
         }
         self.file_name=filename
         self.time=time
@@ -116,9 +117,16 @@ class geo2fds:
         self.allObst= ["&MESH IJK=100, 100, 100, XB={},{},{},{},{},{}/".format(xUL,xLR,yLR,yUL,zMin,zMax)]
         obst = "&OBST XB= {},{},{},{},{},{},  SURF_ID='{}'/ "
 
+        counter = 0
+        for i in FM40:
+            for j in i:
+                if j <0:
+                    counter+=1
+        print(counter)
+
         for row in range(x):
             for col in range(y):
-                id = self.FmDict[FM40[row,col]][-1]
+                # id = self.FmDict[FM40[row,col]][-1]
                 sID =self.FmDict[FM40[row,col]][0]
 
                 self.allObst.append(obst.format(xUL+(row*horz), xUL+((row+1)*horz),yUL+(col*vert),yUL+((col+1)*vert),zMin,DEM[row,col],sID))
@@ -138,7 +146,7 @@ class geo2fds:
         for fire in self.fire_points:
             print(fire)
             xFire,yFire = fire
-            x, y = (self.dataset.bounds.left + xFire, self.dataset.bounds.top - yFire)
+            x, y = (self.dataset.bounds.left + float(xFire), self.dataset.bounds.top - float(yFire))
             row, col = self.dataset.index(x, y)
             # print(row, col,x,y)
             z=self.dataset.read(1)[row,col]

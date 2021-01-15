@@ -7,7 +7,7 @@ from datetime import date
 
 
 class backend:
-    def __init__(self,saveName,lat,long,version="LF140", resolution=30,size=5,fire_points=[]):
+    def __init__(self, saveName, lat, long, version="LF140", resolution=30,size=5,fire_points=[]):
 
         self.checkConus(lat,long)
         self.fire_points = fire_points
@@ -15,7 +15,7 @@ class backend:
         # builds unique(ish) folder name system
         today = date.today()
         d2 = today.strftime("%Y-%m-%d-")
-        self.title=d2+saveName.split('.')[0]
+        self.title = d2+saveName.split('.')[0]
 
         if not os.path.isdir('data'):
             os.mkdir('data')

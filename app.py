@@ -35,7 +35,7 @@ def my_form_post():
     y1_fire = request.form['y1_fire']
     x2_fire = request.form['x2_fire']
     y2_fire = request.form['y2_fire']
-    fds = landfireCurl.backend(name,latitude,longitude,resolution=resolution,size=extent,fire_points=[[x1_fire,y1_fire],[1000,1000]])
+    fds = landfireCurl.backend(name,latitude,longitude,resolution=resolution,size=extent,fire_points=[[x1_fire,y1_fire],[x2_fire,y2_fire]])
     fds.makeGeo(time)
     cFileName=os.path.join('data/',fds.fdsRun())
 
