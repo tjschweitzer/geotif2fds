@@ -116,6 +116,7 @@ class geo2fds:
         # self.allObst = [mesh,mult]
         self.allObst= ["&MESH IJK=100, 100, 100, XB={},{},{},{},{},{}/".format(xUL,xLR,yLR,yUL,zMin,zMax)]
         obst = "&OBST XB= {},{},{},{},{},{},  SURF_ID='{}'/ "
+        vent = "&VENT XB= {},{},{},{},{},{},  SURF_ID='{}'/ "
 
         counter = 0
         for i in FM40:
@@ -130,6 +131,8 @@ class geo2fds:
                 sID =self.FmDict[FM40[row,col]][0]
 
                 self.allObst.append(obst.format(xUL+(row*horz), xUL+((row+1)*horz),yUL+(col*vert),yUL+((col+1)*vert),zMin,DEM[row,col],sID))
+
+                self.allObst.append(vent.format(xUL+(row*horz), xUL+((row+1)*horz),yUL+(col*vert),yUL+((col+1)*vert),DEM[row,col],DEM[row,col],sID))
 
 
     """
@@ -151,6 +154,7 @@ class geo2fds:
             # print(row, col,x,y)
             z=self.dataset.read(1)[row,col]
             fireOut  += "&OBST XB={},{},{},{},{},{},SURF_ID = 'IGN FIRE' /\n".format(x,x+50,y,y+50,z,z+1)
+
         return fireOut
 
     # Todo Add line fire
