@@ -65,9 +65,5 @@
 *.max
 
 !/output/
-
-# Ignore files generated from processing
-/data/*
-
 /__pycache__/
 .DS_store
