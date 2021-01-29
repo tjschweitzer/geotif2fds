@@ -2,40 +2,47 @@ import os, sys, shutil
 from geo2fds import geo2fds
 from datetime import date
 
+ # Helper function for recursively calculating total size of a directory in bytes
+def _dirSize(path):
+    bytes = 0
+    for f in os.listdir(path):
+        bytes += os.path.getsize(f)
 
-
+    return bytes
 
 
 class backend:
-    def __init__(self, saveName, lat, long, version="LF140", resolution=30,size=5,fire_points=[]):
+    def __init__(self, saveName, lat, long, version="LF140", resolution=30, size=5, fire_points=[], run_sim=True):
 
         self.checkConus(lat,long)
         self.fire_points = fire_points
+
+        if not run_sim:
+            self.run_sim = False
+        else:
+            self.run_sim = True
 
         # builds unique(ish) folder name system
         today = date.today()
         d2 = today.strftime("%Y-%m-%d-")
         self.title = d2+saveName.split('.')[0]
 
-        if not os.path.isdir('data'):
-            os.mkdir('data')
-        os.chdir('data')
+        if os.getcwd().split('/')[-1] != 'data':
+            os.chdir('data')
 
-        if not os.path.isdir(self.title):
-            os.mkdir (self.title)
-        else:
-            print("Directory already exists some files may be over written")
-        os.chdir(self.title)
+        # clear data directory if size exceeds 5MB (5,000,000 bytes)
+        if _dirSize(os.getcwd()) > 5000000:
+            os.system("rm -rf *")
 
-        #checks if image folder exists
-        if not os.path.isdir('image'):
-            os.mkdir ('image')
+        print(_dirSize(os.getcwd()))
 
-        self.filedir=os.path.join('image',saveName)
+        os.makedirs(self.title + "/image/")
+        self.filedir=os.path.join(self.title,'image',saveName)
 
         # builds and runs curl command
         command = "curl -s -k \"https://aws.wfas.net/geoserver/ows?service=WPS&version=1.0.0&request=execute&identifier=gs:LandscapeExport&DataInputs=Longitude={};Latitude={};Version={};Resolution={};Extent={}&RawDataOutput=output\" -o {}"
         e = os.system(command.format(long,lat,version,resolution,size,self.filedir))
+
 
     # Checks values for latitude and longitude
     # https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States
@@ -57,9 +64,9 @@ class backend:
         temp=fdsFile.make_fds(hrrpua=2500)
         self.filename = self.title+".fds"
 
-        if not os.path.isdir('fds'):
-            os.mkdir ('fds')
-        path = os.path.join('fds',self.filename)
+        os.makedirs(self.title + '/fds/') 
+        path = os.path.join(self.title,'fds',self.filename)
+
         try:
             with open(path,'w') as output_file:
                 output_file.write(temp)
@@ -73,6 +80,7 @@ class backend:
     # Returns name of compressed file
     def fdsRun(self):
 
+        os.chdir(self.title)
         filename = os.path.join("fds",self.filename)
         fdscommand = "mpiexec -np 1  fds {}"
 
@@ -87,14 +95,16 @@ class backend:
 
         # Changes to folder and runs fds command
 
-        os.system(fdscommand.format(filename))
+        # Run FDS simulation by default, return only FDS input file if run_sim is False
+        if (self.run_sim):
+            os.system(fdscommand.format(filename))
 
-        # moves down one layer then compresses fds files.
-        os.chdir('..')
-        shutil.make_archive(self.title+"-compress",'zip',self.title)
+        # moves back up to data/, compresses fds files, and removes uncompressed directory.
+        os.chdir('../')
+        shutil.make_archive(self.title,'zip',self.title)
+        shutil.rmtree(self.title)
 
-
-        return self.title+"-compress.zip"
+        return self.title+".zip"
 
 if __name__ == "__main__":
     #test data
