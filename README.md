@@ -37,7 +37,7 @@ Convert LANDFIRE raster data into Fire Dynamics Simulator (FDS) simulations and 
 
 Request must specify values for each parameter. The following example creates and runs a FDS simulation roughly centered on Slacker Hill in the San Fransisco bay area, at 30 meters resolution:
 
-    base-url/run-fds?name=slacker_hill&longitude=-122.489732&latitude=37.834887&resolution=30&extent=5&time=1&x1_fire=1&y1_fire=1&x2_fire=1&y1_fire=1&run=true
+    base-url/run-fds?name=slacker_hill&longitude=-122.489732&latitude=37.834887&resolution=30&extent=5&time=1&x1_fire=1&y1_fire=1&x2_fire=1&y2_fire=1&run=true
 
 This request may be executed using the command line utility, <code>curl</code>, with the -o option, or instead by simply pasting into a browser window.
 
