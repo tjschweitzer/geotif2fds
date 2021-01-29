@@ -65,5 +65,6 @@
 *.max
 
 !/output/
-/__pycache__/
+__pycache__/
 .DS_store
+.idea/
