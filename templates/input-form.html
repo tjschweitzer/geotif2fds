@@ -4,8 +4,8 @@
 
 
 {% block body %}
- <h1>{% block title %}Request{% endblock %}</h1>
-  <form method="post">
+ <h1>{% block title %}Request Builder{% endblock %}</h1>
+  <form action="../run-fds" method="post">
     <label for="name">Simulation Name</label>
     <br>
     <input  name="name" id="name" required>
@@ -45,6 +45,12 @@
     <label for="y2_fire">y Location Fire 2 </label>
     <br>
     <input name="y2_fire" id="y2_fire" value="1" required>
+    <br>
+    <input type="radio" name="run" id="run_sim" value="true" checked>
+    <label for="run_sim">Run simulation</label>
+    <br>
+    <input type="radio" name="run" id="input_only" value="false">
+    <label for="input_only">FDS input file only</label>
     <br>
     <input type="submit" value="Submit">
   </form>
